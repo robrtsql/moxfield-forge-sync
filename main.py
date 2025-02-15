@@ -50,14 +50,12 @@ def main():
         deck_resp.raise_for_status()
         deck_json = deck_resp.json()
         build_dck_file(deck_json)
-        import sys
-        sys.exit(0)
 
 
 def build_dck_file(deck_json):
-    mainboard = '\n'.join([get_card_string(card["card"])
+    mainboard = '\n'.join([get_card_string(card["card"], card["quantity"])
                       for card in list(deck_json["boards"]["mainboard"]["cards"].values())])
-    commanders = '\n'.join([get_card_string(card["card"])
+    commanders = '\n'.join([get_card_string(card["card"], card["quantity"])
                             for card in list(deck_json["boards"]["commanders"]["cards"].values())])
     dck_txt = TEMPLATE.format(
         deck_json["name"],
@@ -71,8 +69,8 @@ def build_dck_file(deck_json):
         dck_file.write(dck_txt)
 
 
-def get_card_string(card):
-    return f'1 {card["name"]}|{card["set"].upper()}|1'
+def get_card_string(card, quantity):
+    return f'{quantity} {card["name"]}|{card["set"].upper()}|1'
 
 
 if __name__ == "__main__":
