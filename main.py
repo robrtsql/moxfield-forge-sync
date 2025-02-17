@@ -7,6 +7,7 @@ USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:135.0) Gecko/2010
 FORGE_DECKS_FOLDER = "/Users/rob/commonsync/Forge/decks"
 TEMPLATE = """[metadata]
 Name={}
+
 [Avatar]
 
 [Commander]
@@ -16,14 +17,19 @@ Name={}
 {}
 
 [Sideboard]
+{}
 
 [Planes]
+{}
 
 [Schemes]
+{}
 
 [Conspiracy]
+{}
 
 [Attractions]
+{}
 
 
 """
@@ -53,20 +59,33 @@ def main():
 
 
 def build_dck_file(deck_json):
-    mainboard = '\n'.join([get_card_string(card["card"], card["quantity"])
-                      for card in list(deck_json["boards"]["mainboard"]["cards"].values())])
-    commanders = '\n'.join([get_card_string(card["card"], card["quantity"])
-                            for card in list(deck_json["boards"]["commanders"]["cards"].values())])
+    commanders = get_board_string(deck_json["boards"]["commanders"])
+    mainboard = get_board_string(deck_json["boards"]["mainboard"])
+    sideboard = get_board_string(deck_json["boards"]["sideboard"])
+    planes = get_board_string(deck_json["boards"]["planes"])
+    schemes = get_board_string(deck_json["boards"]["schemes"])
+    conspiracy = ''
+    attractions = get_board_string(deck_json["boards"]["attractions"])
     dck_txt = TEMPLATE.format(
         deck_json["name"],
         commanders,
-        mainboard
+        mainboard,
+        sideboard,
+        planes,
+        schemes,
+        conspiracy,
+        attractions
     )
     dck_filename = f'{deck_json["name"]}.dck'
     dck_full_path = os.path.join(FORGE_DECKS_FOLDER, 'commander', dck_filename)
     print(f'Writing {dck_full_path}.')
     with open(dck_full_path, 'w') as dck_file:
         dck_file.write(dck_txt)
+
+
+def get_board_string(board):
+    return '\n'.join([get_card_string(card["card"], card["quantity"])
+                      for card in list(board["cards"].values())])
 
 
 def get_card_string(card, quantity):
